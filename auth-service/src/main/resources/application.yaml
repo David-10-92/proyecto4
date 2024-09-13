@@ -1,0 +1,12 @@
+server:
+  port: 8082
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/proyecto4
+    username: postgres
+    password: sasa
+  jpa:
+    hibernate:
+      ddl-auto: update
+jwt:
+  secret: asdfafasfasdfasfasfdasdfasfasdffsdfasdfasdfasdfasdfasdfasdfasfdasdfasfdasdfasdfasfdasdfasdfasdfasdfasdfasdfasdfasdfasdfasasaasasaassaasasasasd
