@@ -11,15 +11,15 @@ public class JwtUtils {
 
     private final String secretKey = "asdfafasfasdfasfasfdasdfasfasdffsdfasdfasdfasdfasdfasdfasdfasfdasdfasfdasdfasdfasfdasdfasdfasdfasdfasdfasdfasdfasdfasdfasasaasasaassaasasasasd";
 
-    public Claims getClaims(String token){
+    public Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
-    public boolean isExpirated(String token) {
+    public boolean isExpired(String token) {
         try {
             return getClaims(token).getExpiration().before(new Date());
         } catch (Exception e) {

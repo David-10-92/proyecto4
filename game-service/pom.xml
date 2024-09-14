@@ -72,6 +72,10 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.0.2</version>
 		</dependency>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6d85f269f36607175d4928faa064508a6c430649
 		<dependency>
 			<groupId>org.apache.kafka</groupId>
 			<artifactId>kafka-streams</artifactId>
