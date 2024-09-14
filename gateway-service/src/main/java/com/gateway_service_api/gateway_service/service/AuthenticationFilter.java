@@ -13,12 +13,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
-    private final RouterValidator routerValidator;
+    private final RouterValidator validator;
+
     private final JwtUtils jwtUtils;
 
-    public AuthenticationFilter(RouterValidator routerValidator, JwtUtils jwtUtils) {
+
+    public AuthenticationFilter(RouterValidator validator, JwtUtils jwtUtils) {
         super(Config.class);
-        this.routerValidator = routerValidator;
+        this.validator = validator;
         this.jwtUtils = jwtUtils;
     }
 
@@ -28,22 +30,23 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             var request = exchange.getRequest();
 
             ServerHttpRequest serverHttpRequest = null;
-            if(routerValidator.isSecured.test(request)){
-                if(authMissing(request)){
+            if (validator.isSecured.test(request)) {
+                if (authMissing(request)) {
                     return onError(exchange, HttpStatus.UNAUTHORIZED);
                 }
 
                 String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
 
-                if(authHeader != null && authHeader.startsWith("Bearer ")){
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     authHeader = authHeader.substring(7);
                 } else {
                     return onError(exchange, HttpStatus.UNAUTHORIZED);
                 }
 
-                if(jwtUtils.isExpirated(authHeader)){
-                    return onError(exchange,HttpStatus.UNAUTHORIZED);
+                if (jwtUtils.isExpired(authHeader)) {
+                    return onError(exchange, HttpStatus.UNAUTHORIZED);
                 }
+
 
                 serverHttpRequest = exchange.getRequest()
                         .mutate()
@@ -53,7 +56,6 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
             return chain.filter(exchange.mutate().request(serverHttpRequest).build());
         });
-
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {

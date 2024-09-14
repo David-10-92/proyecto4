@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/proyecto4
     username: postgres
-    password: sasa
+    password: 1234
   jpa:
     hibernate:
       ddl-auto: update
