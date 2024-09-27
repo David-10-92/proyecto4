@@ -2,8 +2,10 @@ package com.user_service_apio.user_service.service.impl;
 
 import com.library_common.library.entities.UserModel;
 import com.user_service_apio.user_service.common.dtos.UpdateUser;
+import com.user_service_apio.user_service.exceptions.UserNotFoundException;
 import com.user_service_apio.user_service.repository.UserRepository;
 import com.user_service_apio.user_service.service.UserService;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,12 +20,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel getUser(String id,Long userId) {
+    public UserModel getUser(String id,Long userId) throws UserNotFoundException {
         return Optional.of(userId)
                 .flatMap(userRepository::findById)
-                .orElseThrow(()-> new RuntimeException("User not found"));
+                .orElseThrow(()-> new UserNotFoundException("User with ID " + userId + " not found"));
     }
 
+    @SneakyThrows
     @Override
     public void updateUser(String id,UpdateUser updateUser, Long userId) {
         Optional.of(userId)
@@ -38,11 +41,12 @@ public class UserServiceImpl implements UserService {
         return existUser;
     }
 
-    private UserModel getUserById(Long aLong) {
+    private UserModel getUserById(Long aLong) throws UserNotFoundException {
         return userRepository.findById(aLong)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + aLong + " not found"));
     }
 
+    @SneakyThrows
     @Override
     public void deleteUser(String id,Long userId) {
         Optional.of(userId)

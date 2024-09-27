@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/proyecto4
     username: postgres
-    password: 1234
+    password: sasa
   jpa:
     hibernate:
       ddl-auto: update
@@ -43,4 +43,3 @@ spring:
                       replicationFactor: 1
                       serdeError: logAndContinue
                       broker: localhost:9092
-

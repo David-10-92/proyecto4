@@ -3,9 +3,11 @@ package com.auth_service_apio.auth_service.service;
 import com.auth_service_apio.auth_service.common.dtos.CreateUser;
 import com.auth_service_apio.auth_service.common.dtos.TokenResponse;
 import com.auth_service_apio.auth_service.common.dtos.LoginUser;
+import com.auth_service_apio.auth_service.exceptions.InvalidLoginException;
+import com.auth_service_apio.auth_service.exceptions.UserCreationException;
 
 public interface AuthService {
 
-    TokenResponse createUser(CreateUser createUser);
-    TokenResponse loginUser(LoginUser loginUser);
+    TokenResponse createUser(CreateUser createUser) throws UserCreationException;
+    TokenResponse loginUser(LoginUser loginUser) throws InvalidLoginException;
 }

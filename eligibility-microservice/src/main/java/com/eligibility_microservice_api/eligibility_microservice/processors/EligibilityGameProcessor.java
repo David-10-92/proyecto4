@@ -2,6 +2,7 @@ package com.eligibility_microservice_api.eligibility_microservice.processors;
 
 import com.eligibility_microservice_api.eligibility_microservice.common.GameCreatedEvent;
 import com.eligibility_microservice_api.eligibility_microservice.common.GameEligibleEvent;
+import com.eligibility_microservice_api.eligibility_microservice.service.GameEligibleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -18,7 +19,7 @@ public class EligibilityGameProcessor {
 
     public Flux<GameEligibleEvent> process(Flux<GameCreatedEvent> gameCreatedEventFlux){
         return gameCreatedEventFlux.doOnNext(given -> log.info("Entry event: {}",given))
-                .flatMap(gameEligibleService::elibilityGame)
+                .flatMap(gameEligibleService::eligibilityGame)
                 .onErrorContinue(this::handleError);
     }
 

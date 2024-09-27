@@ -3,6 +3,9 @@ package com.auth_service_apio.auth_service.service.impl;
 import com.auth_service_apio.auth_service.common.dtos.CreateUser;
 import com.auth_service_apio.auth_service.common.dtos.LoginUser;
 import com.auth_service_apio.auth_service.common.dtos.TokenResponse;
+import com.auth_service_apio.auth_service.exceptions.AuthenticationFailedException;
+import com.auth_service_apio.auth_service.exceptions.InvalidLoginException;
+import com.auth_service_apio.auth_service.exceptions.UserCreationException;
 import com.auth_service_apio.auth_service.repository.UserRepository;
 import com.auth_service_apio.auth_service.service.AuthService;
 import com.auth_service_apio.auth_service.service.JwtService;
@@ -33,12 +36,12 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public TokenResponse createUser(CreateUser createUser) {
+    public TokenResponse createUser(CreateUser createUser) throws UserCreationException {
         return Optional.of(createUser)
                 .map(this::mapToEntity)
                 .map(userRepository::save)
                 .map(existUser -> jwtService.generateToken(existUser.getUserId()))
-                .orElseThrow(() -> new RuntimeException("Error creating user"));
+                .orElseThrow(() -> new UserCreationException("Error creating user"));
     }
 
     private UserModel mapToEntity(CreateUser createUser) {
@@ -51,22 +54,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse loginUser(LoginUser loginUser) {
+    public TokenResponse loginUser(LoginUser loginUser) throws InvalidLoginException {
         return Optional.of(loginUser)
                 .map(req -> userRepository.findByEmail(req.getEmail()))
                 .filter(user -> passwordEncoder.matches(loginUser.getPassword(),user.get().getPassword()))
                 .map(user -> user.get().getUserId())
                 .map(jwtService::generateToken)
-                .orElseThrow(() -> new RuntimeException("Invalid login"));
+                .orElseThrow(() -> new InvalidLoginException("Invalid login credentials"));
     }
 
 
-    private String authenticate(String email,String password){
+    private String authenticate(String email,String password) throws AuthenticationFailedException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
             return email;
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Authentication failed", e);
+            throw new AuthenticationFailedException("Authentication failed", e);
         }
     }
 }

@@ -16,11 +16,11 @@ spring:
       default-binder: kafka_default
       bindings:
         gameBinding-in-0:
-          destination: event.game-created
+          destination: event.game-created,event.user-created
           binder: kafka_default
           useNativeDecoding: true
         gameBinding-out-0:
-          destination: event.game-eligible
+          destination: event.game-eligible,event.user-eligible
           binder: kafka_default
           userNativeDecoding: true
       binders:

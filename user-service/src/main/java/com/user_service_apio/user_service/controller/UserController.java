@@ -3,6 +3,7 @@ package com.user_service_apio.user_service.controller;
 import com.library_common.library.entities.UserModel;
 import com.user_service_apio.user_service.common.constants.ApiPathConstants;
 import com.user_service_apio.user_service.common.dtos.UpdateUser;
+import com.user_service_apio.user_service.exceptions.UserNotFoundException;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public interface UserController {
 
     @GetMapping(value = "{userId}")
-    ResponseEntity<UserModel> getUser(@RequestHeader("userIdRequest") String authId,@PathVariable Long userId);
+    ResponseEntity<UserModel> getUser(@RequestHeader("userIdRequest") String authId,@PathVariable Long userId) throws UserNotFoundException;
 
     @PutMapping(value = "{userId}")
     ResponseEntity<Void> updateUser(@RequestHeader("userIdRequest") String authId,@Valid @RequestBody UpdateUser updateUser, @PathVariable Long userId);

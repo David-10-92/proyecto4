@@ -4,8 +4,11 @@ import com.game_service_api.game_service.common.constants.TopicConstants;
 import com.game_service_api.game_service.common.dtos.CreateGame;
 import com.game_service_api.game_service.common.dtos.UpdateGame;
 import com.game_service_api.game_service.common.entity.GameModel;
+import com.game_service_api.game_service.exceptions.GameCreationException;
+import com.game_service_api.game_service.exceptions.GameNotFoundException;
 import com.game_service_api.game_service.repository.GameRepository;
 import com.game_service_api.game_service.service.GameService;
+import lombok.SneakyThrows;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +25,12 @@ import java.util.Optional;
     }
 
     @Override
-    public GameModel createGame(String userId,CreateGame createGame) {
+    public GameModel createGame(String userId,CreateGame createGame) throws GameCreationException {
         return Optional.of(createGame)
                 .map(game -> mapToEntity(userId,createGame))
                 .map(gameRepository::save)
                 .map(this::sendGameEvent)
-                .orElseThrow(() -> new RuntimeException("Error creating the game"));
+                .orElseThrow(() -> new GameCreationException("Error creating the game"));
     }
 
     private GameModel sendGameEvent(GameModel gameModel) {
@@ -45,12 +48,13 @@ import java.util.Optional;
     }
 
     @Override
-    public GameModel getGame(String userId,Long gameId) {
+    public GameModel getGame(String userId,Long gameId) throws GameNotFoundException {
         return Optional.of(gameId)
                 .flatMap(gameRepository::findById)
-                .orElseThrow(() -> new RuntimeException("Game not found"));
+                .orElseThrow(() -> new GameNotFoundException("Game not found with ID " + gameId));
     }
 
+    @SneakyThrows
     @Override
     public void updateGame(String userId,UpdateGame updateGame,Long gameId) {
         Optional.of(gameId)
@@ -64,11 +68,12 @@ import java.util.Optional;
         return existGame;
     }
 
-    private GameModel getGameById(Long aLong) {
+    private GameModel getGameById(Long aLong) throws GameNotFoundException {
         return gameRepository.findById(aLong)
-                .orElseThrow(()->new RuntimeException("Game not found"));
+                .orElseThrow(()->new GameNotFoundException("Game not found with ID " + aLong));
     }
 
+    @SneakyThrows
     @Override
     public void deleteGame(String userId,Long gameId) {
         Optional.of(gameId)
