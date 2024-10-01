@@ -4,8 +4,7 @@ import com.game_service_api.game_service.common.dtos.CreateGame;
 import com.game_service_api.game_service.common.dtos.UpdateGame;
 import com.game_service_api.game_service.common.entity.GameModel;
 import com.game_service_api.game_service.controller.GameController;
-import com.game_service_api.game_service.exceptions.GameCreationException;
-import com.game_service_api.game_service.exceptions.GameNotFoundException;
+import com.game_service_api.game_service.exceptions.GameException;
 import com.game_service_api.game_service.service.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,12 +19,12 @@ public class GameControllerImpl implements GameController {
     }
 
     @Override
-    public ResponseEntity<GameModel> createGame(String userId,CreateGame createGame) throws GameCreationException {
+    public ResponseEntity<GameModel> createGame(String userId,CreateGame createGame) throws GameException {
         return ResponseEntity.ok(gameService.createGame(userId, createGame));
     }
 
     @Override
-    public ResponseEntity<GameModel> getGame(String userId,Long gameId) throws GameNotFoundException {
+    public ResponseEntity<GameModel> getGame(String userId,Long gameId) throws GameException {
         return ResponseEntity.ok(gameService.getGame(userId, gameId));
     }
 

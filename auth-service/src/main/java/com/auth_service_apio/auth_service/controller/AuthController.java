@@ -4,8 +4,7 @@ import com.auth_service_apio.auth_service.common.constants.ApiPathConstants;
 import com.auth_service_apio.auth_service.common.dtos.CreateUser;
 import com.auth_service_apio.auth_service.common.dtos.LoginUser;
 import com.auth_service_apio.auth_service.common.dtos.TokenResponse;
-import com.auth_service_apio.auth_service.exceptions.InvalidLoginException;
-import com.auth_service_apio.auth_service.exceptions.UserCreationException;
+import com.auth_service_apio.auth_service.exceptions.AuthException;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface AuthController {
 
     @PostMapping(value ="/register")
-    ResponseEntity<TokenResponse> createUser(@Valid @RequestBody  CreateUser createUser) throws UserCreationException;
+    ResponseEntity<TokenResponse> createUser(@Valid @RequestBody  CreateUser createUser) throws AuthException;
     @PostMapping(value = "/login")
-    ResponseEntity<TokenResponse> loginUser(@Valid @RequestBody LoginUser loginUser) throws InvalidLoginException;
+    ResponseEntity<TokenResponse> loginUser(@Valid @RequestBody LoginUser loginUser) throws AuthException;
 }

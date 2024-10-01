@@ -3,13 +3,12 @@ package com.auth_service_apio.auth_service.service.impl;
 import com.auth_service_apio.auth_service.common.dtos.CreateUser;
 import com.auth_service_apio.auth_service.common.dtos.LoginUser;
 import com.auth_service_apio.auth_service.common.dtos.TokenResponse;
-import com.auth_service_apio.auth_service.exceptions.AuthenticationFailedException;
-import com.auth_service_apio.auth_service.exceptions.InvalidLoginException;
-import com.auth_service_apio.auth_service.exceptions.UserCreationException;
+import com.auth_service_apio.auth_service.exceptions.AuthException;
 import com.auth_service_apio.auth_service.repository.UserRepository;
 import com.auth_service_apio.auth_service.service.AuthService;
 import com.auth_service_apio.auth_service.service.JwtService;
 import com.library_common.library.entities.UserModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -36,12 +35,12 @@ public class AuthServiceImpl implements AuthService {
 
 
     @Override
-    public TokenResponse createUser(CreateUser createUser) throws UserCreationException {
+    public TokenResponse createUser(CreateUser createUser) throws AuthException {
         return Optional.of(createUser)
                 .map(this::mapToEntity)
                 .map(userRepository::save)
                 .map(existUser -> jwtService.generateToken(existUser.getUserId()))
-                .orElseThrow(() -> new UserCreationException("Error creating user"));
+                .orElseThrow(() -> new AuthException(HttpStatus.BAD_REQUEST, "Error creating user"));
     }
 
     private UserModel mapToEntity(CreateUser createUser) {
@@ -54,22 +53,21 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse loginUser(LoginUser loginUser) throws InvalidLoginException {
+    public TokenResponse loginUser(LoginUser loginUser) throws AuthException {
         return Optional.of(loginUser)
                 .map(req -> userRepository.findByEmail(req.getEmail()))
                 .filter(user -> passwordEncoder.matches(loginUser.getPassword(),user.get().getPassword()))
                 .map(user -> user.get().getUserId())
                 .map(jwtService::generateToken)
-                .orElseThrow(() -> new InvalidLoginException("Invalid login credentials"));
+                .orElseThrow(() -> new AuthException(HttpStatus.UNAUTHORIZED, "Invalid login credentials"));
     }
 
-
-    private String authenticate(String email,String password) throws AuthenticationFailedException {
+    private String authenticate(String email,String password) throws AuthException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email,password));
             return email;
         } catch (AuthenticationException e) {
-            throw new AuthenticationFailedException("Authentication failed", e);
+            throw new AuthException(HttpStatus.UNAUTHORIZED, "Authentication failed");
         }
     }
 }

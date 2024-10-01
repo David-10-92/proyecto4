@@ -4,12 +4,12 @@ import com.game_service_api.game_service.common.constants.TopicConstants;
 import com.game_service_api.game_service.common.dtos.CreateGame;
 import com.game_service_api.game_service.common.dtos.UpdateGame;
 import com.game_service_api.game_service.common.entity.GameModel;
-import com.game_service_api.game_service.exceptions.GameCreationException;
-import com.game_service_api.game_service.exceptions.GameNotFoundException;
+import com.game_service_api.game_service.exceptions.GameException;
 import com.game_service_api.game_service.repository.GameRepository;
 import com.game_service_api.game_service.service.GameService;
 import lombok.SneakyThrows;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,12 +25,12 @@ import java.util.Optional;
     }
 
     @Override
-    public GameModel createGame(String userId,CreateGame createGame) throws GameCreationException {
+    public GameModel createGame(String userId,CreateGame createGame) throws GameException {
         return Optional.of(createGame)
                 .map(game -> mapToEntity(userId,createGame))
                 .map(gameRepository::save)
                 .map(this::sendGameEvent)
-                .orElseThrow(() -> new GameCreationException("Error creating the game"));
+                .orElseThrow(() -> new GameException(HttpStatus.BAD_REQUEST,"Error creating game"));
     }
 
     private GameModel sendGameEvent(GameModel gameModel) {
@@ -48,10 +48,10 @@ import java.util.Optional;
     }
 
     @Override
-    public GameModel getGame(String userId,Long gameId) throws GameNotFoundException {
+    public GameModel getGame(String userId,Long gameId) throws GameException {
         return Optional.of(gameId)
                 .flatMap(gameRepository::findById)
-                .orElseThrow(() -> new GameNotFoundException("Game not found with ID " + gameId));
+                .orElseThrow(() -> new GameException(HttpStatus.NOT_FOUND,"Game not found with ID "));
     }
 
     @SneakyThrows
@@ -68,9 +68,9 @@ import java.util.Optional;
         return existGame;
     }
 
-    private GameModel getGameById(Long aLong) throws GameNotFoundException {
+    private GameModel getGameById(Long aLong) throws GameException {
         return gameRepository.findById(aLong)
-                .orElseThrow(()->new GameNotFoundException("Game not found with ID " + aLong));
+                .orElseThrow(()-> new GameException(HttpStatus.NOT_FOUND,"Game not found with ID "));
     }
 
     @SneakyThrows
